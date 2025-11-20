@@ -1,0 +1,31 @@
+numpy
+
+#for openAI API
+openai
+
+#for transcribing, should also manually install for audio processing: conda install -c conda-forge ffmpeg
+openai-whisper
+
+#for recording sound
+sounddevice
+
+#for writing sound_file
+soundfile
+
+#for environment operation simulation, may have to go to "Anaconda\envs\vata\Lib\site-packages\mujoco" and copy the mujoco.dll to "Anaconda\envs\vata\Lib\site-packages\robosuite\utils" on Windows
+mujoco
+
+#may need C++ build tools on Windows
+robosuite
+
+#for keyboad monitoring
+pygame
+
+#for demonstration utils
+h5py
+
+#global keyboard Monitoring
+keyboard
+
+
+

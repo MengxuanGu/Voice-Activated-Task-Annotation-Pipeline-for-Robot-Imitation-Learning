@@ -1,0 +1,130 @@
+<mujoco model="tiago dual position scene">
+
+  <compiler inertiafromgeom="true" inertiagrouprange="1 1"/>
+
+  <!-- Include the robot's control configuration file here. 
+   Change the filename to switch between different control methods, such as position, velocity, or motor control. 
+  -->
+  <include file="tiago_dual_position.xml" />
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="150" elevation="-20" realtime="1"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture builtin="checker" height="100" name="texplane" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" type="2d" width="200"/>
+    <material name="MatPlane" reflectance="0.1" shininess="0.4" specular="1" texrepeat="5 5" texuniform="true" texture="texplane"/>
+    <material name="mat-box"  rgba="0.9 0.2 0.2 1"/>  
+    <material name="mat-ball" rgba="0.2 0.4 0.9 1"/>  
+  </asset>
+
+  <worldbody>
+    <!-- Sampling area: Samples (x, y) within this box area during random initialization. pos/size needs to match your desktop. -->
+    <site name="spawn_region" type="box" pos="0.60 0.22 0.76" size="0.10 0.15 0.001" rgba="0 1 0 0"/>
+
+    <!-- Box: 6cm cube, with freejoint for easy grabbing/randomization -->
+    <body name="pickup_box" pos="0.55 0.22 0.78">
+      <freejoint/>
+
+      <geom name="box_bottom" type="box" size="0.05 0.05 0.0025" pos="0 0 0.0025"
+            density="200" group="1" material="mat-box"
+            friction="1.0 0.005 0.0001" contype="1" conaffinity="1"/>
+
+      <geom name="box_wall_xp" type="box" size="0.005 0.045 0.025" pos=" 0.045  0.000 0.0275"
+            density="200" group="1" material="mat-box"
+            friction="1.0 0.005 0.0001" contype="1" conaffinity="1"/>
+      <geom name="box_wall_xn" type="box" size="0.005 0.045 0.025" pos="-0.045  0.000 0.0275"
+            density="200" group="1" material="mat-box"
+            friction="1.0 0.005 0.0001" contype="1" conaffinity="1"/>
+      <geom name="box_wall_yp" type="box" size="0.045 0.005 0.025" pos="0.000  0.045 0.0275"
+            density="200" group="1" material="mat-box"
+            friction="1.0 0.005 0.0001" contype="1" conaffinity="1"/>
+      <geom name="box_wall_yn" type="box" size="0.045 0.005 0.025" pos="0.000 -0.045 0.0275"
+            density="200" group="1" material="mat-box"
+            friction="1.0 0.005 0.0001" contype="1" conaffinity="1"/>
+
+      <site name="box_top" pos="0 0 0.0525" size="0.005" type="sphere" rgba="1 1 1 0.6"/>
+
+      <geom name="box_bbox" type="box" size="0.05 0.05 0.0525" pos="0 0 0.0525"
+            rgba="0 0 0 0" contype="0" conaffinity="0" group="3"/>
+    </body>
+
+
+    <!-- The ball has been changed into a cube for stable gripping -->
+    <body name="pickup_ball" pos="0.65 0.22 0.785">
+      <freejoint/>
+
+      <geom name="ball_geom" type="box" size="0.02 0.02 0.02"
+            density="1000" group="1" material="mat-ball"
+            friction="2.0 0.20 0.02"
+            solref="0.0015 1" solimp="0.95 0.995 0.001 0.5 2"
+            contype="1" conaffinity="1"/>
+
+
+      <site name="ball_top" pos="0 0 0.02" size="0.005" type="sphere" rgba="1 1 1 0.6"/>
+    </body>
+
+    <!-- ===== END: pick-and-place objects on table ===== -->
+    
+    <light name="spotlight" mode="targetbody" target="base_link" pos="1 0 10"/>
+    <geom name="floor" size="0 0 1" type="plane" material="MatPlane" contype="1" conaffinity="1"/>
+    
+    <body name="table" pos="0.7 0 0" quat="0.7071 0 0 0.7071">
+      <geom name="tabletop" type="box" size="0.5625 0.375 0.01" pos="0 0 0.66" rgba="0.35 0.35 0.35 1"/>
+      <geom type="box" size="0.01875 0.01875 0.325" pos=" 0.525  0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
+      <geom type="box" size="0.01875 0.01875 0.325" pos="-0.525  0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
+      <geom type="box" size="0.01875 0.01875 0.325" pos=" 0.525 -0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
+      <geom type="box" size="0.01875 0.01875 0.325" pos="-0.525 -0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
+    </body>
+
+    <!--  Add motion capture geometries -->
+    <body name="base_target" pos="0 0 0" mocap="true">
+      <geom type="sphere" size=".08" contype="0" conaffinity="0" rgba=".6 .3 .3 .2"/>
+    </body>
+
+    <body name="left_gripper_target" pos="0.5 0 .5" quat="0 1 0 0" mocap="true">
+      <geom type="box" size=".05 .05 .05" contype="0" conaffinity="0" rgba=".6 .3 .3 .2" />
+    </body>
+    
+    <body name="right_gripper_target" pos="0.5 0 .5" quat="0 1 0 0" mocap="true">
+      <geom type="box" size=".05 .05 .05" contype="0" conaffinity="0" rgba=".3 .3 .6 .2"/>
+    </body>
+
+  </worldbody>
+
+  <contact>
+    <exclude body1="table" body2="gripper_left_right_tip"/>
+    <exclude body1="table" body2="gripper_left_left_tip"/>
+    <exclude body1="table" body2="gripper_right_right_tip"/>
+    <exclude body1="table" body2="gripper_right_left_tip"/>
+
+    <exclude body1="pickup_ball" body2="gripper_left_right_finger_link"/>
+    <exclude body1="pickup_ball" body2="gripper_left_left_finger_link"/>
+    <exclude body1="pickup_ball" body2="gripper_right_right_finger_link"/>
+    <exclude body1="pickup_ball" body2="gripper_right_left_finger_link"/>
+  </contact>
+
+  <!-- Define keyframes (specific configuration)-->
+  <keyframe>
+    <key name="neutral_pose" qpos="
+    0 0 0
+    0.2 0 0
+    0.35 -0.6 1.4 1.6 -0.3 0.3 0 0 0
+    0.35 -0.6 1.4 1.6 -0.3 0.3 0 0 0
+    0.55 0.10 0.78 1 0 0 0
+    0.65 -0.10 0.785 1 0 0 0" ctrl="
+    0 0 0
+    0.2 0 0
+    0.9 -0.9 1.4 1.6 0 0 0 0 0
+    0.9 -0.9 1.4 1.6 0 0 0 0 0"/>
+  </keyframe>
+
+  <sensor>
+    <fromto geom1="finger_left_1" geom2="tabletop" cutoff="1"/>
+    <fromto geom1="finger_left_2" geom2="tabletop" cutoff="1"/>
+  </sensor>
+
+</mujoco>
